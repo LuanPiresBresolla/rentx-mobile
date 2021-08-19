@@ -12,7 +12,7 @@ import GasolineSvg from '../../assets/gasoline.svg';
 import ExchangeSvg from '../../assets/exchange.svg';
 import PeopleSvg from '../../assets/people.svg';
 
-import { 
+import {
   Container,
   Header,
   CarImages,
@@ -28,12 +28,19 @@ import {
   Acessories,
   Footer,
  } from './styles';
+import { useNavigation } from '@react-navigation/native';
 
 export function CarDetails() {
+  const { navigate, goBack } = useNavigation();
+
+  function handleConfirmRental() {
+    navigate('Scheduling');
+  }
+
   return (
     <Container>
       <Header>
-        <BackButton />
+        <BackButton onPress={() => goBack()} />
       </Header>
 
       <CarImages>
@@ -66,14 +73,14 @@ export function CarDetails() {
         </Acessories>
 
         <About>
-          O Gerador de Texto Lorem Ipsum pode ser utilizado para você que está desenvolvendo seu projeto e precisa de 
-          texto aleatório para preencher os espaços e fazer testes. Assim, dá para testar o layout e a formatação 
+          O Gerador de Texto Lorem Ipsum pode ser utilizado para você que está desenvolvendo seu projeto e precisa de
+          texto aleatório para preencher os espaços e fazer testes. Assim, dá para testar o layout e a formatação
           antes de utilizar com conteúdo real.
-        </About>        
+        </About>
       </Content>
 
       <Footer>
-        <Button title="Confirmar" />
+        <Button title="Escolher período do aluguel" onPress={handleConfirmRental} />
       </Footer>
     </Container>
   );

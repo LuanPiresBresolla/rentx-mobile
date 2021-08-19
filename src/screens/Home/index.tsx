@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StatusBar } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -9,6 +10,8 @@ import { Car } from '../../components/Car';
 import { Container, Header, HeaderContent, TotalCars, CarList } from './styles';
 
 export function Home() {
+  const { navigate } = useNavigation();
+
   const car = {
     brand: 'Audi',
     name: 'RS5 Coupé',
@@ -19,9 +22,13 @@ export function Home() {
     thumbnail: 'https://w7.pngwing.com/pngs/444/585/png-transparent-2018-audi-tt-rs-car-audi-rs5-coupe-audi-compact-car-car-performance-car-thumbnail.png',
   };
 
+  function handleCarDetails() {
+    navigate('CarDetails');
+  }
+
   return (
     <Container>
-      <StatusBar 
+      <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
         translucent
@@ -38,8 +45,10 @@ export function Home() {
         keyExtractor={item => String(item)}
         contentContainerStyle={{ padding: 24 }}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <Car car={car} /> }
-      />      
+        renderItem={({ item }) => (
+          <Car car={car} onPress={handleCarDetails} />
+        )}
+      />
     </Container>
   );
 }

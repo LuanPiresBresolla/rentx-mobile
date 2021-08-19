@@ -10,8 +10,15 @@ import theme from '../../styles/theme';
 import ArrowSvg from '../../assets/arrow.svg';
 
 import { Container, Header, Title, RentalPeriod, DateInfo, DateTitle, DateValue, Content, Footer } from './styles';
+import { useNavigation } from '@react-navigation/native';
 
 export function Scheduling() {
+  const { navigate, goBack } = useNavigation();
+
+  function handleConfirmRental() {
+    navigate('SchedulingDetails');
+  }
+
   return (
     <Container>
       <Header>
@@ -20,7 +27,7 @@ export function Scheduling() {
           translucent
           backgroundColor="transparent"
         />
-        <BackButton color={theme.colors.shape} />
+        <BackButton color={theme.colors.shape} onPress={() => goBack()} />
 
         <Title>
           Escolha uma{`\n`}
@@ -40,7 +47,7 @@ export function Scheduling() {
             <DateTitle>ATÉ</DateTitle>
             <DateValue selected={false}></DateValue>
           </DateInfo>
-        </RentalPeriod>        
+        </RentalPeriod>
       </Header>
 
       <Content
@@ -51,7 +58,7 @@ export function Scheduling() {
       </Content>
 
       <Footer>
-        <Button title="Confirmar" />
+        <Button title="Confirmar" onPress={handleConfirmRental} />
       </Footer>
     </Container>
   );

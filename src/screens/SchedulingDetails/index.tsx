@@ -16,7 +16,7 @@ import PeopleSvg from '../../assets/people.svg';
 
 import theme from '../../styles/theme';
 
-import { 
+import {
   Container,
   Header,
   CarImages,
@@ -41,12 +41,19 @@ import {
   RentalPriceQuota,
   RentalPriceTotal,
  } from './styles';
+import { useNavigation } from '@react-navigation/native';
 
 export function SchedulingDetails() {
+  const { navigate, goBack } = useNavigation();
+
+  function handleCompleteRental() {
+    navigate('SchedulingComplete');
+  }
+
   return (
     <Container>
       <Header>
-        <BackButton />
+        <BackButton onPress={() => goBack()} />
       </Header>
 
       <CarImages>
@@ -95,7 +102,7 @@ export function SchedulingDetails() {
             <DateValue>18/06/2021</DateValue>
           </DateInfo>
         </RentalPeriod>
-      
+
         <RentalPrice>
           <RentalPriceLabel>TOTAL</RentalPriceLabel>
           <RentalPriceDetails>
@@ -106,7 +113,7 @@ export function SchedulingDetails() {
       </Content>
 
       <Footer>
-        <Button title="Alugar Agora" color={theme.colors.success} />
+        <Button title="Alugar Agora" color={theme.colors.success} onPress={handleCompleteRental} />
       </Footer>
     </Container>
   );
