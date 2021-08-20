@@ -1,23 +1,44 @@
 import React from 'react';
 import { Feather } from '@expo/vector-icons';
-import { Calendar as CustomCalendar, LocaleConfig } from 'react-native-calendars';
+import {
+  Calendar as CustomCalendar,
+  LocaleConfig,
+  DateCallbackHandler
+} from 'react-native-calendars';
 
 import theme from '../../styles/theme';
+import { ptBR } from './localeConfig';
 
-LocaleConfig.locales['pt-br'] = {
-  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-  monthNamesShort: ['Jav', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-  dayNamesShort: ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'],
-  today: 'Hoje'
-}
+LocaleConfig.locales['pt-br'] = ptBR;
 LocaleConfig.defaultLocale = 'pt-br';
 
-export function Calendar() {
+export interface DayProps {
+  dateString: string;
+  day: number;
+  month: number;
+  year: number;
+  timestamp: number;
+}
+
+export interface MarkedDateProps {
+  [date: string]: {
+    color: string;
+    textColor: string;
+    disabled?: boolean;
+    disableTouchEvent?: boolean;
+  }
+}
+
+interface CalenderProps {
+  markedDates: MarkedDateProps;
+  onDayPress: DateCallbackHandler;
+}
+
+export function Calendar({ markedDates, onDayPress }: CalenderProps) {
   return (
     <CustomCalendar
-      renderArrow={(direction) => 
-        <Feather name={`arrow-${direction}`} color={theme.colors.shape} size={24} /> 
+      renderArrow={(direction) =>
+        <Feather name={`arrow-${direction}`} color={theme.colors.shape} size={24} />
       }
       headerStyle={{
         backgroundColor: theme.colors.background_secondary,
@@ -32,13 +53,16 @@ export function Calendar() {
         textDayFontSize: 12,
         textMonthFontSize: 20,
         textMonthFontFamily: theme.fonts.secondary_600,
-        monthTextColor: theme.colors.title,        
+        monthTextColor: theme.colors.title,
         arrowStyle: {
           marginHorizontal: -15
         }
       }}
       firstDay={1}
       minDate={new Date()}
+      markingType="period"
+      markedDates={markedDates}
+      onDayPress={onDayPress}
     />
   );
 }

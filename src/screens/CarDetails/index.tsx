@@ -1,16 +1,13 @@
 import React from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { Acessory } from '../../components/Acessory';
 import { BackButton } from '../../components/BackButton';
 import { ImageSlider } from '../../components/ImageSlider';
 import { Button } from '../../components/Button';
 
-import SpeedSvg from '../../assets/speed.svg';
-import AccelerationSvg from '../../assets/acceleration.svg';
-import ForceSvg from '../../assets/force.svg';
-import GasolineSvg from '../../assets/gasoline.svg';
-import ExchangeSvg from '../../assets/exchange.svg';
-import PeopleSvg from '../../assets/people.svg';
+import { CarDTO } from '../../dtos/CarDTO';
+import { getAccessoryIcon } from '../../utils/getAcessoryIcon';
 
 import {
   Container,
@@ -25,16 +22,21 @@ import {
   Period,
   Price,
   About,
-  Acessories,
+  Accessories,
   Footer,
  } from './styles';
-import { useNavigation } from '@react-navigation/native';
+
+interface Params {
+  car: CarDTO;
+}
 
 export function CarDetails() {
   const { navigate, goBack } = useNavigation();
+  const route = useRoute();
+  const { car } = route.params as Params;
 
   function handleConfirmRental() {
-    navigate('Scheduling');
+    navigate('Scheduling', { car });
   }
 
   return (
@@ -44,7 +46,7 @@ export function CarDetails() {
       </Header>
 
       <CarImages>
-        <ImageSlider imagesUrl={['https://w7.pngwing.com/pngs/444/585/png-transparent-2018-audi-tt-rs-car-audi-rs5-coupe-audi-compact-car-car-performance-car-thumbnail.png', 'https://w7.pngwing.com/pngs/444/585/png-transparent-2018-audi-tt-rs-car-audi-rs5-coupe-audi-compact-car-car-performance-car-thumbnail.png']} />
+        <ImageSlider imagesUrl={car.photos} />
       </CarImages>
 
       <Content
@@ -53,30 +55,27 @@ export function CarDetails() {
       >
         <Details>
           <Description>
-            <Brand>Lamborghini</Brand>
-            <Name>Huracan</Name>
+            <Brand>{car.brand}</Brand>
+            <Name>{car.name}</Name>
           </Description>
 
           <Rent>
-            <Period>Ao dia</Period>
-            <Price>R$ 580</Price>
+            <Period>{car.rent.period}</Period>
+            <Price>R$ {car.rent.price}</Price>
           </Rent>
         </Details>
 
-        <Acessories>
-          <Acessory icon={SpeedSvg} name="380Km/h" />
-          <Acessory icon={AccelerationSvg} name="3.2s" />
-          <Acessory icon={ForceSvg} name="800 HP" />
-          <Acessory icon={GasolineSvg} name="Gasolina" />
-          <Acessory icon={ExchangeSvg} name="Auto" />
-          <Acessory icon={PeopleSvg} name="2 Pessoas" />
-        </Acessories>
+        <Accessories>
+          {car.accessories.map(accessory => (
+            <Acessory
+              key={accessory.type}
+              icon={getAccessoryIcon(accessory.type)}
+              name={accessory.name}
+            />
+          ))}
+        </Accessories>
 
-        <About>
-          O Gerador de Texto Lorem Ipsum pode ser utilizado para você que está desenvolvendo seu projeto e precisa de
-          texto aleatório para preencher os espaços e fazer testes. Assim, dá para testar o layout e a formatação
-          antes de utilizar com conteúdo real.
-        </About>
+        <About>{car.about}</About>
       </Content>
 
       <Footer>

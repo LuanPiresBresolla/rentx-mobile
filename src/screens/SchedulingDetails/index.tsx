@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import { RFValue } from 'react-native-responsive-fontsize';
 
@@ -7,14 +8,9 @@ import { BackButton } from '../../components/BackButton';
 import { ImageSlider } from '../../components/ImageSlider';
 import { Button } from '../../components/Button';
 
-import SpeedSvg from '../../assets/speed.svg';
-import AccelerationSvg from '../../assets/acceleration.svg';
-import ForceSvg from '../../assets/force.svg';
-import GasolineSvg from '../../assets/gasoline.svg';
-import ExchangeSvg from '../../assets/exchange.svg';
-import PeopleSvg from '../../assets/people.svg';
-
 import theme from '../../styles/theme';
+import { CarDTO } from '../../dtos/CarDTO';
+import { getAccessoryIcon } from '../../utils/getAcessoryIcon';
 
 import {
   Container,
@@ -28,7 +24,7 @@ import {
   Rent,
   Period,
   Price,
-  Acessories,
+  Accessories,
   Footer,
   RentalPeriod,
   CalendarIcon,
@@ -41,13 +37,50 @@ import {
   RentalPriceQuota,
   RentalPriceTotal,
  } from './styles';
-import { useNavigation } from '@react-navigation/native';
+import { format } from 'date-fns';
+import { getPlatformDate } from '../../utils/getPlatformDate';
+import { api } from '../../services/api';
+import { Alert } from 'react-native';
+
+ interface Params {
+  car: CarDTO;
+  dates: string[];
+}
+
+interface RentalPeriod {
+  startFormatted: string;
+  endFormatted: string;
+}
 
 export function SchedulingDetails() {
   const { navigate, goBack } = useNavigation();
+  const route = useRoute();
+  const { car, dates } = route.params as Params;
+  const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>({} as RentalPeriod);
 
-  function handleCompleteRental() {
-    navigate('SchedulingComplete');
+  const rentTotal = Number(dates.length * car.rent.price);
+
+  useEffect(() => {
+    setRentalPeriod({
+      startFormatted: format(getPlatformDate(new Date(dates[0])), 'dd/MM/yyyy'),
+      endFormatted: format(getPlatformDate(new Date(dates[dates.length - 1])), 'dd/MM/yyyy'),
+    });
+  }, []);
+
+  async function handleCompleteRental() {
+    const schedulesByCar = await api.get(`schedules_bycars/${car.id}`);
+
+    const unavailable_dates = [
+      ...schedulesByCar.data.unavailable_dates,
+      ...dates,
+    ];
+
+    api.put(`schedules_bycars/${car.id}`, {
+      id: car.id,
+      unavailable_dates,
+    })
+    .then(() => navigate('SchedulingComplete'))
+    .catch(() => Alert.alert('Ops', 'Não foi possível confirmar o agendamento'));
   }
 
   return (
@@ -57,7 +90,7 @@ export function SchedulingDetails() {
       </Header>
 
       <CarImages>
-        <ImageSlider imagesUrl={['https://w7.pngwing.com/pngs/444/585/png-transparent-2018-audi-tt-rs-car-audi-rs5-coupe-audi-compact-car-car-performance-car-thumbnail.png', 'https://w7.pngwing.com/pngs/444/585/png-transparent-2018-audi-tt-rs-car-audi-rs5-coupe-audi-compact-car-car-performance-car-thumbnail.png']} />
+        <ImageSlider imagesUrl={car.photos} />
       </CarImages>
 
       <Content
@@ -66,24 +99,25 @@ export function SchedulingDetails() {
       >
         <Details>
           <Description>
-            <Brand>Lamborghini</Brand>
-            <Name>Huracan</Name>
+            <Brand>{car.brand}</Brand>
+            <Name>{car.name}</Name>
           </Description>
 
           <Rent>
             <Period>Ao dia</Period>
-            <Price>R$ 580</Price>
+            <Price>R$ {car.rent.price}</Price>
           </Rent>
         </Details>
 
-        <Acessories>
-          <Acessory icon={SpeedSvg} name="380Km/h" />
-          <Acessory icon={AccelerationSvg} name="3.2s" />
-          <Acessory icon={ForceSvg} name="800 HP" />
-          <Acessory icon={GasolineSvg} name="Gasolina" />
-          <Acessory icon={ExchangeSvg} name="Auto" />
-          <Acessory icon={PeopleSvg} name="2 Pessoas" />
-        </Acessories>
+        <Accessories>
+          {car.accessories.map(accessory => (
+            <Acessory
+              key={accessory.type}
+              icon={getAccessoryIcon(accessory.type)}
+              name={accessory.name}
+            />
+          ))}
+        </Accessories>
 
         <RentalPeriod>
           <CalendarIcon>
@@ -92,22 +126,22 @@ export function SchedulingDetails() {
 
           <DateInfo>
             <DateTitle>DE</DateTitle>
-            <DateValue>18/06/2021</DateValue>
+            <DateValue>{rentalPeriod.startFormatted}</DateValue>
           </DateInfo>
 
           <Feather name="chevron-right" size={RFValue(10)} color={theme.colors.text} />
 
           <DateInfo>
             <DateTitle>DE</DateTitle>
-            <DateValue>18/06/2021</DateValue>
+            <DateValue>{rentalPeriod.endFormatted}</DateValue>
           </DateInfo>
         </RentalPeriod>
 
         <RentalPrice>
           <RentalPriceLabel>TOTAL</RentalPriceLabel>
           <RentalPriceDetails>
-            <RentalPriceQuota>R$ 580 x3 diárias</RentalPriceQuota>
-            <RentalPriceTotal>R$ 2.900</RentalPriceTotal>
+            <RentalPriceQuota>R$ {car.rent.price} x{dates.length} diárias</RentalPriceQuota>
+            <RentalPriceTotal>R$ {rentTotal}</RentalPriceTotal>
           </RentalPriceDetails>
         </RentalPrice>
       </Content>
