@@ -28,12 +28,13 @@ import {
 
 interface Params {
   car: CarDTO;
+  disabled?: boolean;
 }
 
 export function CarDetails() {
   const { navigate, goBack } = useNavigation();
   const route = useRoute();
-  const { car } = route.params as Params;
+  const { car, disabled = false } = route.params as Params;
 
   function handleConfirmRental() {
     navigate('Scheduling', { car });
@@ -78,9 +79,12 @@ export function CarDetails() {
         <About>{car.about}</About>
       </Content>
 
-      <Footer>
-        <Button title="Escolher período do aluguel" onPress={handleConfirmRental} />
-      </Footer>
+      {!disabled && (
+        <Footer>
+          <Button title="Escolher período do aluguel" onPress={handleConfirmRental} />
+        </Footer>
+      )}
+
     </Container>
   );
 }

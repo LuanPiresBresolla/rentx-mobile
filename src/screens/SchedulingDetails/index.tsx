@@ -57,6 +57,7 @@ export function SchedulingDetails() {
   const route = useRoute();
   const { car, dates } = route.params as Params;
   const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>({} as RentalPeriod);
+  const [loading, setLoading] = useState(false);
 
   const rentTotal = Number(dates.length * car.rent.price);
 
@@ -68,19 +69,33 @@ export function SchedulingDetails() {
   }, []);
 
   async function handleCompleteRental() {
-    const schedulesByCar = await api.get(`schedules_bycars/${car.id}`);
+    try {
+      setLoading(true);
+      const schedulesByCar = await api.get(`schedules_bycars/${car.id}`);
 
-    const unavailable_dates = [
-      ...schedulesByCar.data.unavailable_dates,
-      ...dates,
-    ];
+      const unavailable_dates = [
+        ...schedulesByCar.data.unavailable_dates,
+        ...dates,
+      ];
 
-    api.put(`schedules_bycars/${car.id}`, {
-      id: car.id,
-      unavailable_dates,
-    })
-    .then(() => navigate('SchedulingComplete'))
-    .catch(() => Alert.alert('Ops', 'Não foi possível confirmar o agendamento'));
+      await api.post(`schedules_byuser`, {
+        car,
+        user_id: 1,
+        startDate: rentalPeriod.startFormatted,
+        endDate: rentalPeriod.endFormatted,
+      });
+
+      api.put(`schedules_bycars/${car.id}`, {
+        id: car.id,
+        unavailable_dates,
+      })
+      .then(() => navigate('SchedulingComplete'))
+      .catch(() => Alert.alert('Ops', 'Não foi possível confirmar o agendamento'));
+    } catch (error) {
+      Alert.alert('Ops', 'Não foi possível confirmar o agendamento')
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -147,7 +162,13 @@ export function SchedulingDetails() {
       </Content>
 
       <Footer>
-        <Button title="Alugar Agora" color={theme.colors.success} onPress={handleCompleteRental} />
+        <Button
+          title="Alugar Agora"
+          color={theme.colors.success}
+          onPress={handleCompleteRental}
+          loading={loading}
+          enabled={!loading}
+        />
       </Footer>
     </Container>
   );
