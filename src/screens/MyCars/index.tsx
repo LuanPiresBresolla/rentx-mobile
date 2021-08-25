@@ -13,6 +13,7 @@ import {
   Container, Header, Title, SubTitle, CarList, Content, Appointments, AppointmentsTitle, AppointmentsQuantity,
   CarWrapper, CarFooter, CarFooterTitle, CarFooterPeriod, CarFooterDate,
 } from './styles';
+import { LoadingAnimated } from '../../components/LoadingAnimated';
 
 export interface CarProps {
   car: CarDTO;
@@ -73,7 +74,7 @@ export function MyCars() {
           <AppointmentsQuantity>{cars.length}</AppointmentsQuantity>
         </Appointments>
 
-        {loading ? <Loading /> : (
+        {loading ? <LoadingAnimated /> : (
           <CarList
             data={cars}
             keyExtractor={item => String(item.id)}
