@@ -6,6 +6,10 @@ interface ContainerProps {
   color?: string;
 }
 
+interface TitleProps {
+  light: boolean;
+}
+
 export const Container = styled(RectButton)<ContainerProps>`
   width: 100%;
 
@@ -13,13 +17,14 @@ export const Container = styled(RectButton)<ContainerProps>`
   align-items: center;
   justify-content: center;
   border-radius: 2px;
+  margin-bottom: 8px;
 
-  background: ${({ theme, color }) => 
+  background: ${({ theme, color }) =>
   color ? color : theme.colors.main};
 `;
 
-export const Title = styled.Text`
+export const Title = styled.Text<TitleProps>`
   font-size: ${RFValue(15)}px;
   font-family: ${({ theme }) => theme.fonts.primary_500};
-  color: ${({ theme }) => theme.colors.shape};
+  color: ${({ theme, light }) => light ? theme.colors.header : theme.colors.shape};
 `;
