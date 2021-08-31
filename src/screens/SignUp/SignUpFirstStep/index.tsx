@@ -16,7 +16,7 @@ export function SignUpFirstStep() {
   const { navigate, goBack } = useNavigation();
 
   const [email, setEmail] = useState('');
-  const [nome, setNome] = useState('');
+  const [name, setName] = useState('');
   const [driverLicense, setDriverLicense] = useState('');
 
   async function handleNextStep() {
@@ -24,11 +24,11 @@ export function SignUpFirstStep() {
       const schema = Yup.object().shape({
         driverLicense: Yup.string().required('CNH obrigatória'),
         email: Yup.string().required('E-mail obrigatório').email('Digite um e-mail válido'),
-        nome: Yup.string().required('Nome obrigatório'),
+        name: Yup.string().required('Nome obrigatório'),
       });
 
       const user = {
-        nome,
+        name,
         email,
         driverLicense,
       };
@@ -72,8 +72,8 @@ export function SignUpFirstStep() {
             <Input
               iconName="user"
               placeholder="Nome"
-              value={nome}
-              onChangeText={setNome}
+              value={name}
+              onChangeText={setName}
             />
 
             <Input

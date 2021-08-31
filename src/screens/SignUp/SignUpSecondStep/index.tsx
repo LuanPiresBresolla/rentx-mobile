@@ -6,8 +6,9 @@ import * as Yup from 'yup';
 import { BackButton } from '../../../components/BackButton';
 import { Bullet } from '../../../components/Bullet';
 import { Button } from '../../../components/Button';
-import { Input } from '../../../components/Input';
+
 import { PasswordInput } from '../../../components/PasswordInput';
+import { api } from '../../../services/api';
 import theme from '../../../styles/theme';
 
 import { Container, Header, Steps, Title, SubTitle, Form, FormTitle  } from './styles';
@@ -21,16 +22,18 @@ interface Params {
 }
 
 export function SignUpSecondStep() {
-  const { navigate, goBack } = useNavigation();
+  const { reset, goBack } = useNavigation();
   const routes = useRoute();
 
   const { user } = routes.params as Params;
 
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
   async function handleRegister() {
     try {
+      setLoading(true);
       const schema = Yup.object().shape({
         passwordConfirmation: Yup.string().required('Confirmação de senha obrigatória'),
         password: Yup.string().required('Senha obrigatória'),
@@ -41,12 +44,34 @@ export function SignUpSecondStep() {
       if (password !== passwordConfirmation) {
         Alert.alert('As senhas não conferem', 'Verifique seus dados e tente novamente');
       }
+
+      const { driverLicense: driver_license, email, name } = user;
+      await api.post('users', {
+        name,
+        email,
+        driver_license,
+        password,
+      }).then(() => {
+        reset({
+          routes: [{ name: 'Confirmation', params: {
+            title: 'Conta criada!',
+            message: `Agora é só fazer login\ne aproveitar`,
+            nextScreen: 'SignIn',
+          }}],
+          index: 0,
+        });
+      }).catch((error) => {
+        setLoading(false);
+        console.log(error);
+        Alert.alert('Ops', 'Não foi possível realizar seu cadastro');
+      });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         Alert.alert('Ops', error.message);
       } else {
         Alert.alert('Erro na autenticação', 'Ocorreu um erro ao fazer login, verifique suas credencias e tente novamente');
       }
+      setLoading(false);
     }
   }
 
@@ -92,8 +117,8 @@ export function SignUpSecondStep() {
           <Button
             title="Cadastrar"
             color={theme.colors.success}
-            enabled={true}
-            loading={false}
+            enabled={!loading}
+            loading={loading}
             onPress={handleRegister}
           />
         </Container>
