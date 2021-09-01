@@ -21,7 +21,7 @@ export function Splash() {
 
   function startApp() {
     reset({
-      routes: [{ name: 'Home' }],
+      routes: [{ name: 'SignIn' }],
       index: 0,
     });
   }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, BackHandler } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
@@ -68,10 +68,6 @@ export function Home() {
     loadCars();
   }, []);
 
-  // useEffect(() => {
-  //   BackHandler.addEventListener('hardwareBackPress', () => true);
-  // }, []);
-
   function handleCarDetails(car: CarDTO) {
     navigate('CarDetails', { car });
   }
@@ -106,13 +102,13 @@ export function Home() {
         />
       )}
 
-      <PanGestureHandler onGestureEvent={onGestureEvent}>
+      {/* <PanGestureHandler onGestureEvent={onGestureEvent}>
         <Animated.View style={[myCarsButtonStyle, { position: 'absolute', bottom: 13, right: 22 }]}>
           <ButtonAnimated onPress={handleOpenMyCars} style={styles.button}>
             <Ionicons name="ios-car-sport" size={32} color={theme.colors.shape} />
           </ButtonAnimated>
         </Animated.View>
-      </PanGestureHandler>
+      </PanGestureHandler> */}
     </Container>
   );
 }

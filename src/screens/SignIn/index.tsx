@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { PasswordInput } from '../../components/PasswordInput';
+import { useAuth } from '../../hooks/useAuth';
 
 import theme from '../../styles/theme';
 
@@ -14,7 +15,9 @@ import { Container, Header, Title, SubTitle, Form, Footer } from './styles';
 
 export function SignIn() {
   const { navigate } = useNavigation();
+  const { signIn } = useAuth();
 
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -24,18 +27,22 @@ export function SignIn() {
 
   async function handleSignIn() {
     try {
+      setLoading(true);
       const schema = Yup.object().shape({
         email: Yup.string().required('E-mail obrigatório').email('Digite um e-mail válido'),
         password: Yup.string().required('Senha obrigatória'),
       });
 
       await schema.validate({ email, password });
+
+      await signIn({ email, password });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         Alert.alert('Ops', error.message);
       } else {
         Alert.alert('Erro na autenticação', 'Ocorreu um erro ao fazer login, verifique suas credencias e tente novamente');
       }
+      setLoading(false);
     }
   }
 
@@ -76,8 +83,8 @@ export function SignIn() {
           <Footer>
             <Button
               title="Login"
-              enabled={true}
-              loading={false}
+              enabled={!loading}
+              loading={loading}
               onPress={handleSignIn}
             />
 
