@@ -5,6 +5,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import { PanGestureHandler, RectButton } from 'react-native-gesture-handler';
 import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 const ButtonAnimated = Animated.createAnimatedComponent(RectButton);
 
@@ -19,11 +20,13 @@ import { CarDTO } from '../../dtos/CarDTO';
 import { Loading } from '../../components/Loading';
 import theme from '../../styles/theme';
 import { LoadingAnimated } from '../../components/LoadingAnimated';
+import { Alert } from 'react-native';
 
 export function Home() {
   const { navigate } = useNavigation();
   const [loading, setLoading] = useState(true);
   const [cars, setCars] = useState<CarDTO[]>([]);
+  const netInfo = useNetInfo();
 
   const positionY = useSharedValue(0);
   const positionX = useSharedValue(0);
@@ -51,6 +54,14 @@ export function Home() {
       positionY.value = withSpring(0);
     },
   });
+
+  useEffect(() => {
+    if (netInfo.isConnected) {
+      Alert.alert('Você está online');
+    } else {
+      Alert.alert('Você está offline');
+    }
+  }, [netInfo.isConnected]);
 
   useEffect(() => {
     let isMounted = true;

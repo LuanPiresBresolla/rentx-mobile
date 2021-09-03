@@ -45,6 +45,7 @@ export function PasswordInput({ iconName, value, ...rest }: InputProps) {
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
         isFocused={isFocused}
+        autoCorrect={false}
         {...rest}
       />
 

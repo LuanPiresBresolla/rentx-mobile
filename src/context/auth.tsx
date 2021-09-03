@@ -10,7 +10,7 @@ interface User {
   email: string;
   name: string;
   driver_license: string;
-  avatar?: string;
+  avatar: string;
   token: string;
 }
 
@@ -22,6 +22,8 @@ interface SignInCredentials {
 interface AuthContextData {
   user: User;
   signIn: (credentials: SignInCredentials) => Promise<void>;
+  signOut: () => Promise<void>;
+  updatedUser: (data: User) => Promise<void>;
 }
 
 export const AuthContenxt = createContext<AuthContextData>({} as AuthContextData);
@@ -76,8 +78,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  async function signOut() {
+    try {
+      const userCollection = database.get<ModelUser>('users');
+
+      await database.write(async () => {
+        const userSelected = await userCollection.find(user.id);
+        await userSelected.destroyPermanently();
+      });
+
+      setUser({} as User);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async function updatedUser(data: User) {
+    try {
+      const userCollection = database.get<ModelUser>('users');
+
+      await database.write(async () => {
+        const userSelected = await userCollection.find(data.id);
+        await userSelected.update(( userData ) => {
+          userData.name = data.name;
+          userData.driver_license = data.driver_license;
+          userData.avatar = data.avatar;
+        });
+      });
+
+      setUser(data);
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
   return (
-    <AuthContenxt.Provider value={{ user, signIn }}>
+    <AuthContenxt.Provider value={{ user, signIn, signOut, updatedUser }}>
       {children}
     </AuthContenxt.Provider>
   );
