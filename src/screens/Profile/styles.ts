@@ -1,3 +1,4 @@
+import FastImage from 'react-native-fast-image';
 import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -46,7 +47,7 @@ export const PhotoContianer = styled.View`
   margin-top: 48px;
 `;
 
-export const Photo = styled.Image`
+export const Photo = styled(FastImage)`
   width: 180px;
   height: 180px;
   border-radius: 90px;

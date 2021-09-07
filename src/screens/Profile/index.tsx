@@ -16,10 +16,12 @@ import {
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/Button';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 export function Profile() {
   const { goBack } = useNavigation();
   const { user, signOut, updatedUser } = useAuth();
+  const netInfo = useNetInfo();
 
   const [option, setOption] = useState<'dataEdit' | 'passwordEdit'>('dataEdit');
   const [avatar, setAvatar] = useState(user.avatar || '');
@@ -27,7 +29,11 @@ export function Profile() {
   const [driverLicense, setDriverLicense] = useState(user.driver_license);
 
   function handleOptionChange(option: 'dataEdit' | 'passwordEdit') {
-    setOption(option);
+    if (!netInfo.isConnected && option === 'passwordEdit') {
+      Alert.alert('Sem conexão de internet!', 'Para mudar a senha conecte-se a internet.');
+    } else {
+      setOption(option);
+    }
   }
 
   async function handleSignOut() {

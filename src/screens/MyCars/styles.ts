@@ -2,8 +2,7 @@ import { FlatList } from 'react-native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
-import { CarProps } from '.';
-import { CarDTO } from '../../dtos/CarDTO';
+import { DataProps } from '.';
 
 export const Container = styled.View`
   flex: 1;
@@ -39,7 +38,7 @@ export const SubTitle = styled.Text`
   margin-top: 24px;
 `;
 
-export const CarList = styled(FlatList as new () => FlatList<CarProps>)``;
+export const CarList = styled(FlatList as new () => FlatList<DataProps>)``;
 
 export const Content = styled.View`
   width: 100%;

@@ -5,9 +5,14 @@ import { useAuth } from '../hooks/useAuth';
 
 import { AppTabRoutes } from './app.tab.routes';
 import { AuthRoutes } from './auth.routes';
+import { LoadingAnimated } from '../components/LoadingAnimated';
 
 export function Routes() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingAnimated />
+  }
 
   return (
     <NavigationContainer>

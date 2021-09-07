@@ -21,6 +21,7 @@ interface SignInCredentials {
 
 interface AuthContextData {
   user: User;
+  loading: boolean;
   signIn: (credentials: SignInCredentials) => Promise<void>;
   signOut: () => Promise<void>;
   updatedUser: (data: User) => Promise<void>;
@@ -34,6 +35,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>({} as User);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUserData() {
@@ -45,6 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         api.defaults.headers.Authorization = `Bearer ${userData.token}`;
         setUser(userData);
       }
+      setLoading(false);
     }
     loadUserData();
   }, []);
@@ -62,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const userCollection = database.get<ModelUser>('users');
       await database.write(async () => {
-        await userCollection.create((newUser) => {
+        const userCreated = await userCollection.create((newUser) => {
           newUser.user_id = user.id,
           newUser.name = user.name,
           newUser.email = user.email,
@@ -70,10 +73,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
           newUser.avatar = user.avatar,
           newUser.token = token
         });
+
+        user.id = userCreated.id;
       });
 
       setUser({ ...user, token });
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error);
     }
   }
@@ -88,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       setUser({} as User);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error);
     }
   }
@@ -107,14 +112,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       setUser(data);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       throw new Error(error);
     }
   }
 
   return (
-    <AuthContenxt.Provider value={{ user, signIn, signOut, updatedUser }}>
+    <AuthContenxt.Provider value={{ user, loading, signIn, signOut, updatedUser }}>
       {children}
     </AuthContenxt.Provider>
   );
